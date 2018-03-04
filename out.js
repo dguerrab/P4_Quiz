@@ -17,7 +17,7 @@ const biglog = (msg, color) => {
 };
 
 const errorlog = (msg) => {
-	console.log('${colorize("Error", "red")}: ${colorize(colorize(msg, "red"), "bgYellowBright")}');
+	console.log(`${colorize("Error", "red")}: ${colorize(colorize(msg, "red"), "bgYellowBright")}`);
 };
 
 exports = module.exports = {

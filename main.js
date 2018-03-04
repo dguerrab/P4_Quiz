@@ -14,7 +14,7 @@ const rl = readline.createInterface({
 	  const hits = completions.filter((c) => c.startsWith(line));
 	  // show all completions if none found
 	  return [hits.length ? hits : completions, line];
-	}
+	},
 });
 
 rl.prompt();
@@ -66,7 +66,7 @@ rl.on('line', (line) => {
 			break;
 	}
 }).on('close', () => {
-	console.log('¡Hasta otra!');
+	log('¡Hasta otra!', "green");
 	process.exit(0);
 });
 
@@ -86,48 +86,86 @@ const help = () => {
 }
 
 const add = () => {
-	console.log('Añadir un nuevo quiz.');
-	rl.prompt();
-}
+	rl.question(colorize(' Introduzca una pregunta: ', 'red'), question => {
+		rl.question(colorize(' Introduzca la respuesta: ', 'red'), answer => {
+			model.addQ(question, answer);
+			log(` ${colorize('Se ha añadido', 'magenta')}: ${question}`);
+			rl.prompt();
+		});
+	});
+};
 
 const list = () => {
 	model.getAll().forEach((quiz, id) => {
 		log(` [${colorize(id, 'magenta')}]: ${quiz.question}`);
 	});
 	rl.prompt();
-}
+};
 
 const test = id => {
-	console.log('Probar el quiz indicado.');
-	rl.prompt();
-}
+	if(typeof id === "undefined"){
+		errorlog(`El valor de id no es válido`);
+		rl.prompt();
+	} else {
+		try{
+			const quiz = model.getById(id);
+			
+			rl.question()
+			log(`${quiz.question}   `);
+		} catch(error) {
+			errorlog(error.message);
+			rl.prompt();
+		}
+	};
+};
 
 const play = () => {
 	console.log('Jugar a preguntar aleatoriamente todos los quizzes.');
 	rl.prompt();
-}
+};
 
 const show = id => {
-	console.log('Muestra la pregunta y la respuesta el quiz indicado.');
+	if(typeof id === "undefined"){
+		errorlog(`El valor de id no es válido`);
+		rl.prompt();
+	} else {
+		try{
+			const quiz = model.getById(id);
+			log(` [${colorize(id, 'magenta')}]: ${quiz.question} ${colorize('=>', 'magenta')} ${quiz.answer}`);
+		} catch(error) {
+			errorlog(error.message);
+			rl.prompt();
+		}
+	};
 	rl.prompt();
-}
+};
 
 const edit = id => {
 	console.log('Editar el quiz indicado.');
 	rl.prompt();
-}
+};
 
 const del = id => {
-	console.log('Borrar el quiz indicado.');
+	if(typeof id === "undefined"){
+		errorlog(`El valor de id no es válido`);
+		rl.prompt();
+	} else {
+		try{
+			model.deleteById(id);
+		} catch(error) {
+			errorlog(error.message);
+			rl.prompt();
+		}
+	};
 	rl.prompt();
-}
+};
 
 const credits = () => {
 	console.log('Autor de la práctica:');
 	console.log('Daniel Guerra Bernardo');
 	rl.prompt();
-}
+};
 
 const quit = () => {
 	rl.close();
-}
+};
