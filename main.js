@@ -110,8 +110,8 @@ const test = id => {
 		try{
 			const quiz = model.getById(id);		
 			rl.question(colorize(`${quiz.question}  `, 'red'), answer => {
-				if(answer === quiz.answer){
-					log(` ${colorize('Has acertado!', 'green')}`);
+				if(answer.toUpperCase() === quiz.answer.toUpperCase()){
+					log(` ${colorize('¡Respuesta correcta!', 'green')}`);
 				} else {
 					log(` ${colorize('Respuesta incorrecta', 'red')}`);
 				}
