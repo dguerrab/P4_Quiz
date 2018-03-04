@@ -108,10 +108,15 @@ const test = id => {
 		rl.prompt();
 	} else {
 		try{
-			const quiz = model.getById(id);
-			
-			rl.question()
-			log(`${quiz.question}   `);
+			const quiz = model.getById(id);		
+			rl.question(colorize(`${quiz.question}  `, 'red'), answer => {
+				if(answer === quiz.answer){
+					log(` ${colorize('Has acertado!', 'green')}`);
+				} else {
+					log(` ${colorize('Respuesta incorrecta', 'red')}`);
+				}
+				rl.prompt();
+			});
 		} catch(error) {
 			errorlog(error.message);
 			rl.prompt();
