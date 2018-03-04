@@ -1,71 +1,133 @@
-
-
 const readline = require('readline');
-console.log('QUIZ CORE');
+const model = require('./model');
+const {colorize, log, biglog, errorlog} = require('./out');
+
+
+biglog('QUIZ CORE', 'blue');
 
 const rl = readline.createInterface({
 	input: process.stdin,
 	output: process.stdout,
-	prompt: 'quiz> '
+	prompt: colorize('quiz> ', 'yellow'),
+	completer: (line) => {
+	  const completions = 'h help add delete list p play show test credits quit q'.split(' ');
+	  const hits = completions.filter((c) => c.startsWith(line));
+	  // show all completions if none found
+	  return [hits.length ? hits : completions, line];
+	}
 });
 
 rl.prompt();
 
 rl.on('line', (line) => {
-	switch (line.trim()) {
+	let args = line.split(" ");
+	let cmd = args[0].toLowerCase().trim();
+	switch (cmd) {
 		case '':
+			rl.prompt();
 			break;
 		case 'help':
 		case 'h':
-			console.log('Commandos:');
-			console.log('  h|help - Muestra esta ayuda.');
-			console.log('  list - Listar los quizzes existentes.');
-			console.log('  show <id> - Muestra la pregunta y la respuesta el quiz indicado.');
-			console.log('  add - Añadir un nuevo quiz interactivamente.');
-			console.log('  delete <id> - Borrar el quiz indicado.');
-			console.log('  edit <id> - Editar el quiz indicado.');
-			console.log('  test <id> - Probar el quiz indicado.');
-			console.log('  p|play - Jugar a preguntar aleatoriamente todos los quizzes.');
-			console.log('  credits - Créditos.');
-			console.log('  q|quit - Salir del programa.');
+			help();
 			break;
 		case 'quit':
 		case 'q':
-			rl.close();
+			quit();
 			break;
 		case 'add':
-			console.log('Añadir un nuevo quiz.');
+			add();
 			break;		
 		case 'list':
-			console.log('Listar los quizzes existentes.');
+			list();
 			break;
 		case 'show':
-			console.log('Muestra la pregunta y la respuesta el quiz indicado.');
+			show(args[1]);
 			break;
 		case 'test':
-			console.log('Probar el quiz indicado.');
+			test(args[1]);
 			break;	
 		case 'play':
 		case 'p':
-			console.log('Jugar a preguntar aleatoriamente todos los quizzes.');
+			play();
 			break;	
 		case 'delete':
-			console.log('Borrar el quiz indicado.');
+			del(args[1]);
 			break;	
 		case 'edit':
-			console.log('Editar el quiz indicado.');
+			edit(args[1]);
 			break;	
 		case 'credits':
-			console.log('Autor de la práctica:');
-			console.log('Daniel Guerra Bernardo');
+			credits();
 			break;	
 		default:
-			console.log(`Comando desconocido '${line.trim()}'`);
-			console.log('Use 'help' para ver los comandos disponibles.');
+			console.log(`Comando desconocido '${cmd}'`);
+			console.log('Use "help" para ver los comandos disponibles.');
+			rl.prompt();
 			break;
 	}
-	rl.prompt();
 }).on('close', () => {
 	console.log('¡Hasta otra!');
 	process.exit(0);
 });
+
+const help = () => {
+	console.log('Commandos:');
+	console.log('  h|help - Muestra esta ayuda.');
+	console.log('  list - Listar los quizzes existentes.');
+	console.log('  show <id> - Muestra la pregunta y la respuesta el quiz indicado.');
+	console.log('  add - Añadir un nuevo quiz interactivamente.');
+	console.log('  delete <id> - Borrar el quiz indicado.');
+	console.log('  edit <id> - Editar el quiz indicado.');
+	console.log('  test <id> - Probar el quiz indicado.');
+	console.log('  p|play - Jugar a preguntar aleatoriamente todos los quizzes.');
+	console.log('  credits - Créditos.');
+	console.log('  q|quit - Salir del programa.');
+	rl.prompt();
+}
+
+const add = () => {
+	console.log('Añadir un nuevo quiz.');
+	rl.prompt();
+}
+
+const list = () => {
+	model.getAll().forEach((quiz, id) => {
+		log(` [${colorize(id, 'magenta')}]: ${quiz.question}`);
+	});
+	rl.prompt();
+}
+
+const test = id => {
+	console.log('Probar el quiz indicado.');
+	rl.prompt();
+}
+
+const play = () => {
+	console.log('Jugar a preguntar aleatoriamente todos los quizzes.');
+	rl.prompt();
+}
+
+const show = id => {
+	console.log('Muestra la pregunta y la respuesta el quiz indicado.');
+	rl.prompt();
+}
+
+const edit = id => {
+	console.log('Editar el quiz indicado.');
+	rl.prompt();
+}
+
+const del = id => {
+	console.log('Borrar el quiz indicado.');
+	rl.prompt();
+}
+
+const credits = () => {
+	console.log('Autor de la práctica:');
+	console.log('Daniel Guerra Bernardo');
+	rl.prompt();
+}
+
+const quit = () => {
+	rl.close();
+}
