@@ -157,6 +157,7 @@ const play = () => {
 							playGame();
 						} else {
 							log(` ${colorize('Respuesta incorrecta', 'red')}`);
+							log(` ${colorize('FIN', 'red')}`);
 							biglog(puntos, 'red');
 							rl.prompt();
 						}
