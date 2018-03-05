@@ -125,8 +125,50 @@ const test = id => {
 };
 
 const play = () => {
-	console.log('Jugar a preguntar aleatoriamente todos los quizzes.');
-	rl.prompt();
+	let puntos = 0;
+	let nextQ = [];
+	model.getAll().forEach((quiz, id) => {
+		nextQ.push(id);
+	});
+	const playGame = () => {
+		if (nextQ.length == 0){
+			log(` ${colorize('FIN', 'green')}`);
+			biglog(puntos, 'green');
+			rl.prompt();
+		} else {
+			let id = nextQ[Math.floor(Math.random()*nextQ.length | 0)]
+			if (nextQ.length == 1){
+				nextQ.pop();
+			}
+			nextQ.splice(nextQ[id], 1);
+			log(id);
+			log(nextQ);
+			if(typeof id === "undefined"){
+				errorlog(`El valor de id no es válido`);
+				rl.prompt();
+			} else {
+				try{
+					const quiz = model.getById(id);		
+					rl.question(colorize(`${quiz.question}  `, 'red'), answer => {
+						if(answer.toUpperCase() === quiz.answer.toUpperCase()){
+							log(` ${colorize('¡Respuesta correcta!', 'green')}`);							
+							puntos++;
+							biglog(puntos, 'blue');
+							playGame();
+						} else {
+							log(` ${colorize('Respuesta incorrecta', 'red')}`);
+							biglog(puntos, 'red');
+							rl.prompt();
+						}
+					});
+				} catch(error) {
+					errorlog(error.message);
+					rl.prompt();
+				}
+			};
+		}
+	};
+	playGame();
 };
 
 const show = id => {
