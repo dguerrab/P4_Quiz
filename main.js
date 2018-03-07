@@ -77,7 +77,7 @@ const validateId = id => {
 			reject(new Error(`Falta el parámetro <id>`));
 		} else {
 			id = parseInt(id);
-			if (Number.isNan(id)){
+			if (Number.isNaN(id)){
 				reject(new Error(`El valor del parámetro <id> no es un número`));
 			} else {
 				resolve(id);
@@ -147,74 +147,74 @@ const list = () => {
 };
 
 const test = id => {
-	if(typeof id === "undefined"){
-		errorlog(`El valor de id no es válido`);
-		rl.prompt();
-	} else {
-		try{
-			const quiz = models.getById(id);		
-			rl.question(colorize(`${quiz.question}  `, 'red'), answer => {
-				if(answer.toUpperCase() === quiz.answer.toUpperCase()){
-					log(` ${colorize('¡Respuesta correcta!', 'green')}`);
-				} else {
-					log(` ${colorize('Respuesta incorrecta', 'red')}`);
-				}
-				rl.prompt();
-			});
-		} catch(error) {
-			errorlog(error.message);
-			rl.prompt();
-		}
-	};
+	// if(typeof id === "undefined"){
+	// 	errorlog(`El valor de id no es válido`);
+	// 	rl.prompt();
+	// } else {
+	// 	try{
+	// 		const quiz = models.getById(id);		
+	// 		rl.question(colorize(`${quiz.question}  `, 'red'), answer => {
+	// 			if(answer.toUpperCase() === quiz.answer.toUpperCase()){
+	// 				log(` ${colorize('¡Respuesta correcta!', 'green')}`);
+	// 			} else {
+	// 				log(` ${colorize('Respuesta incorrecta', 'red')}`);
+	// 			}
+	// 			rl.prompt();
+	// 		});
+	// 	} catch(error) {
+	// 		errorlog(error.message);
+	// 		rl.prompt();
+	// 	}
+	// };
 };
 
 const play = () => {
-	let puntos = 0;
-	let nextQ = [];
-	models.getAll().forEach((quiz, id) => {
-		nextQ.push(id);
-	});
-	const playGame = () => {
-		if (nextQ.length == 0){
-			log(` ${colorize('FIN', 'green')}`);
-			biglog(puntos, 'green');
-			rl.prompt();
-		} else {
-			let id = nextQ[Math.floor(Math.random()*nextQ.length | 0)]
-			if (nextQ.length == 1){
-				nextQ.pop();
-			} else {
-				nextQ.splice(nextQ[id], 1);
-			}
-			log(id);
-			log(nextQ);
-			if(typeof id === "undefined"){
-				errorlog(`El valor de id no es válido`);
-				rl.prompt();
-			} else {
-				try{
-					const quiz = models.getById(id);		
-					rl.question(colorize(`${quiz.question}  `, 'red'), answer => {
-						if(answer.toUpperCase() === quiz.answer.toUpperCase()){
-							log(` ${colorize('¡Respuesta correcta!', 'green')}`);							
-							puntos++;
-							biglog(puntos, 'blue');
-							playGame();
-						} else {
-							log(` ${colorize('Respuesta incorrecta', 'red')}`);
-							log(` ${colorize('FIN', 'red')}`);
-							biglog(puntos, 'red');
-							rl.prompt();
-						}
-					});
-				} catch(error) {
-					errorlog(error.message);
-					rl.prompt();
-				}
-			};
-		}
-	};
-	playGame();
+	// let puntos = 0;
+	// let nextQ = [];
+	// models.getAll().forEach((quiz, id) => {
+	// 	nextQ.push(id);
+	// });
+	// const playGame = () => {
+	// 	if (nextQ.length == 0){
+	// 		log(` ${colorize('FIN', 'green')}`);
+	// 		biglog(puntos, 'green');
+	// 		rl.prompt();
+	// 	} else {
+	// 		let id = nextQ[Math.floor(Math.random()*nextQ.length | 0)]
+	// 		if (nextQ.length == 1){
+	// 			nextQ.pop();
+	// 		} else {
+	// 			nextQ.splice(nextQ[id], 1);
+	// 		}
+	// 		log(id);
+	// 		log(nextQ);
+	// 		if(typeof id === "undefined"){
+	// 			errorlog(`El valor de id no es válido`);
+	// 			rl.prompt();
+	// 		} else {
+	// 			try{
+	// 				const quiz = models.getById(id);		
+	// 				rl.question(colorize(`${quiz.question}  `, 'red'), answer => {
+	// 					if(answer.toUpperCase() === quiz.answer.toUpperCase()){
+	// 						log(` ${colorize('¡Respuesta correcta!', 'green')}`);							
+	// 						puntos++;
+	// 						biglog(puntos, 'blue');
+	// 						playGame();
+	// 					} else {
+	// 						log(` ${colorize('Respuesta incorrecta', 'red')}`);
+	// 						log(` ${colorize('FIN', 'red')}`);
+	// 						biglog(puntos, 'red');
+	// 						rl.prompt();
+	// 					}
+	// 				});
+	// 			} catch(error) {
+	// 				errorlog(error.message);
+	// 				rl.prompt();
+	// 			}
+	// 		};
+	// 	}
+	// };
+	// playGame();
 };
 
 const show = id => {

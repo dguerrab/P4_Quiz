@@ -1,7 +1,7 @@
-const fs = require("fs");
+// const fs = require("fs");
 const Sequelize = require('sequelize');
-const options = { logging: false, operatorsAliases: false };
-const sequelize = new Sequelize("sqlite:db.sqlite", options);
+const options = { logging: false };
+const sequelize = new Sequelize("sqlite:quizzes.sqlite", options);
 
 // const user = sequelize.define(
 // 	'user',	{ 
