@@ -169,7 +169,44 @@ const test = id => {
 };
 
 const play = () => {
-
+	let score = 0;
+	let nextQ = [];
+	models.quiz.findAll({raw: true})
+	.then(quizzes => {
+		nextQ = quizzes;
+	}).then(() => {
+		playGame();
+	});
+	let playGame = () => {
+		if (nextQ.length <= 0){
+			log(` ${colorize('FIN', 'green')}`);
+			biglog(score, 'green');
+			rl.prompt();
+			return;
+		}
+		let pos = Math.floor(Math.random()*nextQ.length);
+		let quiz = nextQ[pos];
+		nextQ.splice(pos, 1);
+		makeQuestion(quiz.question)
+		.then(answer => {
+			if(answer.toUpperCase() === quiz.answer.toUpperCase()){
+				log(` ${colorize('¡Respuesta correcta!', 'green')}`);
+				score++;
+				biglog(score, 'blue');
+				playGame();
+			} else {
+				log(` ${colorize('Respuesta incorrecta', 'red')}`);
+				log(` ${colorize('FIN', 'red')}`);
+				biglog(score, 'red');
+				rl.prompt();
+			}
+		})
+		.catch(error => {
+			errorlog(error.message);
+		}).then(() => {
+			rl.prompt();
+		});
+	};
 };
 
 const show = id => {
