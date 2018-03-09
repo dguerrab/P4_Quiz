@@ -168,6 +168,25 @@ const test = id => {
 	});
 };
 
+// let playGame = () {
+// 	const whereOpt = {'id': {[Sequelize.Op.notIn]: resolved}};
+// 	return models.quiz.count({where: whereOpt})
+// 	.then(function(count) {
+// 		return models.quiz.findAll({
+// 			where: whereOpt,
+// 			offset: Math.floor(Math.random()*count),
+// 			limit: 1
+// 		});
+// 	})
+// 	.then(quizzes => quizzes[0])
+// 	.then(quiz => {
+// 		if (!quiz) {
+// 			log(` ${colorize('FIN', 'green')}`);
+// 			return;
+// 		}
+// 	})
+// }
+
 const play = () => {
 	let score = 0;
 	let nextQ = [];
