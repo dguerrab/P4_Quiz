@@ -40,7 +40,7 @@ sequelize.sync()
 	}
 })
 .catch(error => {
-	errorlog(error.message);
+	errorlog(socket, error.message);
 });
 
 module.exports = sequelize;
