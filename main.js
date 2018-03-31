@@ -1,81 +1,83 @@
 const readline = require('readline');
 const Sequelize = require('sequelize');
 const {models} = require('./model');
-const {colorize, log, biglog, errorlog}socket,  = require('./out');
+const {colorize, log, biglog, errorlog} = require('./out');
 const net = require("net");
 
+//net.createServer(function(socket) {
 net.createServer(socket => {
 	socket.on("error", () => { rl.close(); })
 	.on("end", () => { rl.close(); })
 	console.log("Nuevo cliente en " + socket.remoteAddress);
-});
 
-biglog(socket, 'QUIZ CORE', 'blue');
+	biglog(socket, 'QUIZ CORE', 'blue');
 
-const rl = readline.createInterface({
-	input: socket,
-	output: socket,
-	prompt: colorize('quiz> ', 'yellow'),
-	completer: (line) => {
-	  const completions = 'h help add delete list p play show test credits quit q'.split(' ');
-	  const hits = completions.filter((c) => c.startsWith(line));
-	  // show all completions if none found
-	  return [hits.length ? hits : completions, line];
-	},
-});
+	const rl = readline.createInterface({
+		input: socket,
+		output: socket,
+		prompt: colorize('quiz> ', 'yellow'),
+		completer: (line) => {
+		  const completions = 'h help add delete list p play show test credits quit q'.split(' ');
+		  const hits = completions.filter((c) => c.startsWith(line));
+		  // show all completions if none found
+		  return [hits.length ? hits : completions, line];
+		},
+	});
 
-rl.prompt();
+	rl.prompt();
 
-rl.on('line', (line) => {
-	let args = line.split(" ");
-	let cmd = args[0].toLowerCase().trim();
-	switch (cmd) {
-		case '':
-			rl.prompt();
-			break;
-		case 'help':
-		case 'h':
-			help();
-			break;
-		case 'quit':
-		case 'q':
-			quit();
-			break;
-		case 'add':
-			add();
-			break;		
-		case 'list':
-			list();
-			break;
-		case 'show':
-			show(args[1]);
-			break;
-		case 'test':
-			test(args[1]);
-			break;	
-		case 'play':
-		case 'p':
-			play();
-			break;	
-		case 'delete':
-			del(args[1]);
-			break;	
-		case 'edit':
-			edit(args[1]);
-			break;	
-		case 'credits':
-			credits();
-			break;	
-		default:
-			socket.write(`Comando desconocido '${cmd}'`);
-			socket.write('Use "help" para ver los comandos disponibles.');
-			rl.prompt();
-			break;
-	}
-}).on('close', () => {
-	log(socket, '¡Hasta otra!', "green");
-	socket.end();
+	rl.on('line', (line) => {
+		let args = line.split(" ");
+		let cmd = args[0].toLowerCase().trim();
+		switch (cmd) {
+			case '':
+				rl.prompt();
+				break;
+			case 'help':
+			case 'h':
+				help(socket, rl);
+				break;
+			case 'quit':
+			case 'q':
+				quit(socket, rl);
+				break;
+			case 'add':
+				add(socket, rl);
+				break;		
+			case 'list':
+				list(socket), rl;
+				break;
+			case 'show':
+				show(socket, args[1], rl);
+				break;
+			case 'test':
+				test(socket, args[1], rl);
+				break;	
+			case 'play':
+			case 'p':
+				play(socket, rl);
+				break;	
+			case 'delete':
+				del(socket, args[1], rl);
+				break;	
+			case 'edit':
+				edit(socket, args[1], rl);
+				break;	
+			case 'credits':
+				credits(socket, rl);
+				break;	
+			default:
+				socket.write(`Comando desconocido '${cmd}'`);
+				socket.write('Use "help" para ver los comandos disponibles.');
+				rl.prompt();
+				break;
+		}
+	}).on('close', () => {
+		log(socket, '¡Hasta otra!', "green");
+		socket.end();
+	});
 }).listen(3030);
+
 
 const validateId = id => {
 	return new Sequelize.Promise((resolve, reject) => {
@@ -100,7 +102,7 @@ const makeQuestion = text => {
 	});
 };
 
-const help = () => {
+const help = (socket, rl) => {
 	socket.write('Commandos:');
 	socket.write('  h|help - Muestra esta ayuda.');
 	socket.write('  list - Listar los quizzes existentes.');
@@ -111,11 +113,11 @@ const help = () => {
 	socket.write('  test <id> - Probar el quiz indicado.');
 	socket.write('  p|play - Jugar a preguntar aleatoriamente todos los quizzes.');
 	socket.write('  credits - Créditos.');
-	socket.write('  q|quit - Salir del programa.');
+	socket.write('  q|quit - Salir del programa.' + "\n");
 	rl.prompt();
 };
 
-const add = () => {
+const add = (socket, rl) => {
 	makeQuestion(' Introduzca una pregunta:')
 	.then(q => {
 		return makeQuestion(' Introduzca la respuesta:')
@@ -141,7 +143,7 @@ const add = () => {
 	});
 };
 
-const list = () => {
+const list = (socket, rl) => {
 	models.quiz.findAll()
 	.each(quiz => {
 		log(socket, ` [${colorize(quiz.id, 'magenta')}]: ${quiz.question}`);
@@ -152,7 +154,7 @@ const list = () => {
 	});
 };
 
-const test = id => {
+const test = (socket, id, rl) => {
 	validateId(id)
 	.then(id => models.quiz.findById(id))
 	.then(quiz => {
@@ -193,7 +195,7 @@ const test = id => {
 // 	})
 // }
 
-const play = () => {
+const play = (socket, rl) => {
 	let score = 0;
 	let nextQ = [];
 	models.quiz.findAll({raw: true})
@@ -202,7 +204,7 @@ const play = () => {
 	}).then(() => {
 		playGame();
 	});
-	let playGame = () => {
+	let playGame = (socket) => {
 		if (nextQ.length <= 0){
 			log(socket, ` ${colorize('FIN', 'green')}`);
 			biglog(socket, score, 'green');
@@ -234,7 +236,7 @@ const play = () => {
 	};
 };
 
-const show = id => {
+const show = (socket, id, rl) => {
 	validateId(id)
 	.then(id => models.quiz.findById(id))
 	.then(quiz => {
@@ -249,7 +251,7 @@ const show = id => {
 	});
 };
 
-const edit = id => {
+const edit = (socket, id, rl) => {
 	validateId(id)
 	.then(id => models.quiz.findById(id))
 	.then(quiz => {
@@ -285,7 +287,7 @@ const edit = id => {
 	});
 };
 
-const del = id => {
+const del = (socket, id, rl) => {
 	validateId(id)
 	.then(id => models.quiz.destroy({where: {id}}))
 	.catch(error => {
@@ -295,12 +297,12 @@ const del = id => {
 	});
 };
 
-const credits = (socket) => {
+const credits = (socket, rl) => {
 	socket.write('Autor de la práctica:');
 	socket.write('Daniel Guerra Bernardo');
 	rl.prompt();
 };
 
-const quit = (socket) => {
+const quit = (socket, rl) => {
 	rl.close();
 };
